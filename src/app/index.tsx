@@ -1,10 +1,15 @@
+import { usePerf } from '@/components/recipes/perf';
+import { RecipeCard } from '@/components/recipes/RecipeCard';
+import { ALL_RECIPES } from '@/components/recipes/recipes-api';
+import { ThemedText } from '@/components/themed-text';
 import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import * as Updates from 'expo-updates';
+import { RecipeList } from "@/components/recipes/RecipeList";
+import { Alert, Button, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/components/animated-icon';
 import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -29,35 +34,24 @@ function getDevMenuHint() {
 }
 
 export default function HomeScreen() {
+  const mounted = usePerf('ScrollView');
+  async function onCheckUpdates() {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (!update.isAvailable) {
+        Alert.alert("L'application est à jour.");
+        return;
+      }
+      await Updates.fetchUpdateAsync();
+      await Updates.reloadAsync();
+    } catch (error) {
+      Alert.alert('Erreur', String(error));
+    }
+  }
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <RecipeList />
+    </SafeAreaView>
   );
 }
 
