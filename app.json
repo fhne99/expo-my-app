@@ -27,6 +27,27 @@
     "plugins": [
       "expo-router",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Scanner les QR codes des lieux",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-location",
+          {
+            "locationWhenInUsePermission": "Afficher les lieux proches de vous"
+          }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Détecter les secousses de l'appareil"
+        }
+      ],
+      "expo-notifications",
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
