@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
  
 import { useLifecycleLog } from "@/hooks/use-lifecycle-log";
  
-const SCHEME = "myapp";
+const SCHEME = "my-app-dev";
  
 export default function LiensScreen() {
   useLifecycleLog("Liens");

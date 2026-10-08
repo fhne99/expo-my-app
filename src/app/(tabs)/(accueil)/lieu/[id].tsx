@@ -1,6 +1,6 @@
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, Linking, StyleSheet, Text, View } from "react-native";
  
 import { getLieu } from "@/data/lieux";
 import { useLifecycleLog } from "@/hooks/use-lifecycle-log";
@@ -12,8 +12,10 @@ export default function LieuScreen() {
             return () => clearInterval(id);
         }, []),
     );
+
+    const SCHEME = "my-app-dev";
   
-    const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
+    const { id, from, ref } = useLocalSearchParams<{ id: string; from?: string; ref?: string }>();
     const router = useRouter();
     const [compteur, setCompteur] = useState(0);
     useLifecycleLog(`Lieu ${id}`);
@@ -37,7 +39,7 @@ export default function LieuScreen() {
             <Text>
                 {lieu.type} · {lieu.ville}
             </Text>
-            {from ? <Text>Ouvert depuis : {from}</Text> : null}
+            {from ? <Text>Ouvert depuis : {from}</Text> : null}{ref && <Text>Référence : {ref}</Text>}
             <Text>Compteur local : {compteur}</Text>
             <Button title="+1" onPress={() => setCompteur((valeur) => valeur + 1)} />
             <Button
@@ -47,6 +49,8 @@ export default function LieuScreen() {
                 }
             />
             <Button title="Retour" onPress={() => router.back()} />
+            <Button title="Lieu 7 avec ref" onPress={() => Linking.openURL(`${SCHEME}://lieu/7?ref=affiche`)} />
+            <Button title="Lieu abc" onPress={() => Linking.openURL(`${SCHEME}://lieu/abc`)} />
         </View>
     );
 }
