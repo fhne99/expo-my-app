@@ -1,92 +1,37 @@
-import { usePerf } from '@/components/recipes/perf';
-import { RecipeCard } from '@/components/recipes/RecipeCard';
-import { ALL_RECIPES } from '@/components/recipes/recipes-api';
-import { ThemedText } from '@/components/themed-text';
-import * as Device from 'expo-device';
-import * as Updates from 'expo-updates';
-import { RecipeList } from "@/components/recipes/RecipeList";
-import { Alert, Button, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+import { useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+ 
+import { CameraSection } from "@/components/labo/CameraSection";
+ 
+const SECTIONS = [{ key: "camera", label: "Caméra", Component: CameraSection }];
+ 
+export default function LaboScreen() {
+  const [current, setCurrent] = useState(SECTIONS[0].key);
+  const { Component } = SECTIONS.find((section) => section.key === current) ?? SECTIONS[0];
+ 
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
-
-export default function HomeScreen() {
-  const mounted = usePerf('ScrollView');
-  async function onCheckUpdates() {
-    try {
-      const update = await Updates.checkForUpdateAsync();
-      if (!update.isAvailable) {
-        Alert.alert("L'application est à jour.");
-        return;
-      }
-      await Updates.fetchUpdateAsync();
-      await Updates.reloadAsync();
-    } catch (error) {
-      Alert.alert('Erreur', String(error));
-    }
-  }
-  return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <RecipeList />
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.menu}>
+        {SECTIONS.map(({ key, label }) => (
+          <Pressable
+            key={key}
+            onPress={() => setCurrent(key)}
+            style={[styles.tab, key === current && styles.tabActive]}
+          >
+            <Text style={key === current && styles.labelActive}>{label}</Text>
+          </Pressable>
+        ))}
+      </View>
+      <Component />
     </SafeAreaView>
   );
 }
-
+ 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
+  container: { flex: 1 },
+  menu: { flexDirection: "row", gap: 8, padding: 12 },
+  tab: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 16, backgroundColor: "#e5e5ea" },
+  tabActive: { backgroundColor: "#208AEF" },
+  labelActive: { color: "white", fontWeight: "600" },
 });
